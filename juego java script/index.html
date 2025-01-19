@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Juego de Memoria</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      background-color: #f4f4f4;
+    }
+    .memory-game {
+      display: grid;
+      grid-template-columns: repeat(4, 100px);
+      grid-gap: 15px;
+    }
+    .card {
+      width: 100px;
+      height: 100px;
+      background-color: #333;
+      border-radius: 8px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: white;
+      font-size: 24px;
+      cursor: pointer;
+      transform: scale(1);
+      transition: transform 0.3s;
+    }
+    .card.flip {
+      background-color: #fff;
+      color: #333;
+      transform: scale(1.1);
+    }
+    .hidden {
+      visibility: hidden;
+    }
+  </style>
+</head>
+<body>
+  <div class="memory-game" id="memoryGame">
+    <!-- Las tarjetas se generan dinámicamente -->
+  </div>
+
+  <script>
+    const icons = ['🍎', '🍌', '🍇', '🍉', '🍓', '🍒', '🍍', '🥝'];
+    const cards = [...icons, ...icons]; // Duplicar para crear parejas
+    cards.sort(() => 0.5 - Math.random()); // Barajar las cartas
+
+    const memoryGame = document.getElementById('memoryGame');
+    let flippedCards = [];
+    let matchedCards = 0;
+
+    // Crear las cartas dinámicamente
+    cards.forEach((icon, index) => {
+      const card = document.createElement('div');
+      card.classList.add('card');
+      card.dataset.icon = icon;
+      card.dataset.index = index;
+      memoryGame.appendChild(card);
+
+      // Añadir evento al hacer clic en la carta
+      card.addEventListener('click', () => {
+        if (card.classList.contains('flip') || flippedCards.length === 2) return;
+
+        card.classList.add('flip');
+        card.textContent = icon;
+        flippedCards.push(card);
+
+        if (flippedCards.length === 2) {
+          checkForMatch();
+        }
+      });
+    });
+
+    function checkForMatch() {
+      const [card1, card2] = flippedCards;
+
+      if (card1.dataset.icon === card2.dataset.icon) {
+        // Coincidencia
+        setTimeout(() => {
+          card1.classList.add('hidden');
+          card2.classList.add('hidden');
+          matchedCards += 2;
+
+          if (matchedCards === cards.length) {
+            setTimeout(() => alert('¡Ganaste!'), 300);
+          }
+
+          flippedCards = [];
+        }, 500);
+      } else {
+        // No coinciden
+        setTimeout(() => {
+          card1.classList.remove('flip');
+          card2.classList.remove('flip');
+          card1.textContent = '';
+          card2.textContent = '';
+          flippedCards = [];
+        }, 1000);
+      }
+    }
+  </script>
+</body>
+</html>
